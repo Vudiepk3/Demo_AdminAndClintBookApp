@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:showIn = "navigation_view">
+
+    <group
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/nav_home"
+            android:icon="@drawable/icon_home_24px"
+            android:title="Home"/>
+
+        <item
+            android:id="@+id/nav_feedback"
+            android:icon="@drawable/icon_feedback_24px"
+            android:title="FeedBack"/>
+
+        <item
+            android:id="@+id/nav_share"
+            android:icon="@drawable/icon_share_24px"
+            android:title="Share"/>
+
+        <item
+            android:id="@+id/nav_vote"
+            android:icon="@drawable/icon_vote_24px"
+            android:title="Vote"/>
+    </group>
+
+
+</menu>

@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">Demo_BookApp</string>
+    <string name="maths">Toán Học</string>
+    <string name="literature">Văn Học</string>
+    <string name="english">Tiếng Anh</string>
+    <string name="physics">Vật Lý   </string>
+    <string name="chemistry">Hoá Học</string>
+    <string name="biology">Sinh Học</string>
+    <string name="history">Lịch Sử</string>
+    <string name="geography">Địa Lý</string>
+    <string name="civic">  Giáo Dục\nCông Dân</string>
+    <string name="sologan">Học, Học Nữa, Học Mãi</string>
+    <string name="todo">TODO</string>
+    <string name="open_nav">Open Navigation Drawer</string>
+    <string name="close_nav">Close Navigation Drawer</string>
+    <string name="finish">Kết Thúc</string>
+</resources>
