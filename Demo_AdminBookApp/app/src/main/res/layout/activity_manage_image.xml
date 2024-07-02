@@ -5,14 +5,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ShowDocumentActivity">
+    tools:context=".ManageImageActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:background="@drawable/baseline_button_background"
+        android:background="@drawable/lavender_border"
         android:orientation="horizontal">
 
         <ImageView
@@ -20,15 +20,16 @@
             android:layout_width="60dp"
             android:layout_height="60dp"
             android:layout_margin="10dp"
-            android:src="@drawable/image_document" />
+            android:src="@drawable/picture" />
 
         <TextView
-            android:id="@+id/txtNumberDocument"
+            android:id="@+id/txtNumberImage"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_below="@id/linearLayout"
-            android:textSize="20dp"
+            android:layout_marginStart="10dp"
+            android:textSize="25dp"
             android:text="Số Ảnh Hiện Có:"
             android:textStyle="bold"
             android:textColor="@color/black"/>
@@ -38,6 +39,7 @@
     <androidx.appcompat.widget.SearchView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
         android:layout_marginStart="12dp"
         android:layout_marginEnd="12dp"
         android:layout_below="@id/linearLayout"
@@ -46,9 +48,9 @@
         app:searchHintIcon="@null"
         app:queryHint="Search..."
         android:focusable="false"
-        app:closeIcon="@drawable/icon_clear_24"
-        app:searchIcon="@drawable/icon_search_24"
-        android:background="@drawable/baseline_button_background"/>
+        app:closeIcon="@drawable/baseline_clear_24"
+        app:searchIcon="@drawable/baseline_search_24"
+        android:background="@drawable/lavender_border"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:layout_marginTop="10dp"
@@ -58,5 +60,15 @@
         android:layout_below="@id/search"
         android:scrollbars="vertical"/>
 
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="40dp"
+        android:backgroundTint="@color/lavender"
+        app:tint = "@color/white"
+        android:src="@drawable/baseline_add_24" />
 
 </RelativeLayout>

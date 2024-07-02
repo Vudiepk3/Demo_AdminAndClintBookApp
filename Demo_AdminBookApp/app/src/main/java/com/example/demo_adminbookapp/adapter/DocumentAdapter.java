@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.demo_adminbookapp.R;
-import com.example.demo_adminbookapp.ViewPDFActivity;
+import com.example.demo_adminbookapp.documentsactivity.ViewPDFActivity;
 import com.example.demo_adminbookapp.model.DocumentModel;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -27,7 +27,7 @@ public class DocumentAdapter extends FirebaseRecyclerAdapter<DocumentModel, Docu
 
     private DatabaseReference databaseReference;
     private List<DocumentModel> filteredList;
-
+    private List<DocumentModel> documentList;
     @Override
     protected void onBindViewHolder(@NonNull final CategoryViewHolder holder, int position, @NonNull final DocumentModel model) {
         holder.txtTitle.setText(model.getTitle());
@@ -56,7 +56,7 @@ public class DocumentAdapter extends FirebaseRecyclerAdapter<DocumentModel, Docu
                         .setMessage("Bạn có chắc chắn muốn xóa file " + fileName + "?")
                         .setPositiveButton("Xóa", (dialog, which) -> {
                             // Xóa node từ Firebase Realtime Database
-                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("category");
+                            DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("documents");
                             databaseReference.child(nodeKey).removeValue()
                                     .addOnSuccessListener(aVoid -> {
                                         // Xóa thành công
@@ -97,8 +97,8 @@ public class DocumentAdapter extends FirebaseRecyclerAdapter<DocumentModel, Docu
         return new CategoryViewHolder(view);
     }
 
-    public void setFilteredList(List<DocumentModel> filteredList) {
-        this.filteredList = filteredList;
+    public void searchDataList(List<DocumentModel> searchList) {
+        documentList = searchList;
         notifyDataSetChanged();
     }
     @Override

@@ -12,9 +12,6 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
-import android.util.Log;
-import android.webkit.ConsoleMessage;
-import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
@@ -33,87 +30,84 @@ import java.net.URLEncoder;
 
 public class ViewPDFActivity extends AppCompatActivity {
 
-    private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 1;
+    private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 1; // Yêu cầu quyền ghi vào bộ nhớ ngoài
 
     WebView pdfview;
     FloatingActionButton btnDownload;
     ProgressBar progressBar;
-    private long downloadId;
-    private BroadcastReceiver onDownloadComplete;
+    private long downloadId; // ID tải xuống để theo dõi tiến trình tải xuống
+    private BroadcastReceiver onDownloadComplete; // Bộ thu phát để nhận thông báo khi tải xuống hoàn tất
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_pdfactivity);
 
-        pdfview = findViewById(R.id.viewPdf);
-        btnDownload = findViewById(R.id.btnDownload);
-        progressBar = findViewById(R.id.progressBar);
+        pdfview = findViewById(R.id.viewPdf); // Khởi tạo WebView để hiển thị PDF
+        btnDownload = findViewById(R.id.btnDownload); // Khởi tạo nút tải xuống
+        progressBar = findViewById(R.id.progressBar); // Khởi tạo thanh tiến trình
 
-        initializeWebView();
-        setupDownloadButton();
-        registerDownloadReceiver();
+        initializeWebView(); // Thiết lập WebView
+        setupDownloadButton(); // Thiết lập nút tải xuống
+        registerDownloadReceiver(); // Đăng ký bộ thu phát cho sự kiện tải xuống hoàn tất
     }
-    private void initializeWebView() {
-        pdfview.getSettings().setJavaScriptEnabled(true);
 
-        String filename = getIntent().getStringExtra("title");
-        String fileurl = getIntent().getStringExtra("pdf");
+    private void initializeWebView() {
+        pdfview.getSettings().setJavaScriptEnabled(true); // Kích hoạt JavaScript trong WebView
+
+        String filename = getIntent().getStringExtra("title"); // Lấy tên file từ Intent
+        String fileurl = getIntent().getStringExtra("pdf"); // Lấy URL file từ Intent
 
         final ProgressDialog pd = new ProgressDialog(this);
         pd.setTitle(filename);
         pd.setMessage("Opening....!!!");
+        pd.show(); // Hiển thị hộp thoại tiến trình
 
         pdfview.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
-                pd.show();
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                pd.dismiss();
+                pd.dismiss(); // Đóng hộp thoại tiến trình khi trang đã tải xong
             }
         });
 
-        pdfview.setWebChromeClient(new WebChromeClient() {
-            @Override
-            public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-                Log.e("WebView", consoleMessage.message());
-                return true;
-            }
-        });
-
-        loadPdfFile(fileurl);
+        loadPdfFile(fileurl); // Tải file PDF vào WebView
     }
+
     private void loadPdfFile(String fileurl) {
         try {
             String encodedUrl = URLEncoder.encode(fileurl, "UTF-8");
-            pdfview.loadUrl("http://docs.google.com/gview?embedded=true&url=" + encodedUrl);
+            pdfview.loadUrl("http://docs.google.com/gview?embedded=true&url=" + encodedUrl); // Sử dụng Google Docs để hiển thị PDF
         } catch (Exception ex) {
             ex.printStackTrace();
             Toast.makeText(this, "Error loading PDF", Toast.LENGTH_SHORT).show();
         }
     }
+
     private void setupDownloadButton() {
         btnDownload.setOnClickListener(v -> {
             String filename = getIntent().getStringExtra("title");
             String fileurl = getIntent().getStringExtra("pdf");
             if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                downloadFile(this, fileurl, filename);
+                downloadFile(this, fileurl, filename); // Nếu đã có quyền, bắt đầu tải xuống
             } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUEST_WRITE_EXTERNAL_STORAGE); // Yêu cầu quyền ghi vào bộ nhớ ngoài
             }
         });
     }
+
     private void registerDownloadReceiver() {
         onDownloadComplete = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
                 long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
                 if (downloadId == id) {
-                    progressBar.setVisibility(android.view.View.GONE); // Ẩn progressBar
+                    progressBar.setVisibility(android.view.View.GONE); // Ẩn thanh tiến trình khi tải xuống hoàn tất
 
                     // Lấy đường dẫn đến file đã tải xuống
                     DownloadManager downloadManager = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
@@ -137,8 +131,9 @@ public class ViewPDFActivity extends AppCompatActivity {
             }
         };
 
-        registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)); // Đăng ký bộ thu phát cho sự kiện tải xuống hoàn tất
     }
+
     private void downloadFile(Context context, String pdfLink, String fileName) {
         try {
             DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
@@ -156,13 +151,14 @@ public class ViewPDFActivity extends AppCompatActivity {
 
             downloadId = downloadManager.enqueue(request); // Lưu ID tải xuống
 
-            progressBar.setVisibility(android.view.View.VISIBLE); // Hiển thị progressBar
+            progressBar.setVisibility(android.view.View.VISIBLE); // Hiển thị thanh tiến trình
             Toast.makeText(context, "Downloading...", Toast.LENGTH_SHORT).show();
 
         } catch (Exception e) {
             Toast.makeText(this, "Error downloading PDF: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -178,9 +174,10 @@ public class ViewPDFActivity extends AppCompatActivity {
             }
         }
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        unregisterReceiver(onDownloadComplete);
+        unregisterReceiver(onDownloadComplete); // Hủy đăng ký bộ thu phát khi hoạt động bị phá hủy
     }
 }

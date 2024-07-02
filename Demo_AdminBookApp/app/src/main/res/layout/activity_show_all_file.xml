@@ -6,28 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginBottom="55dp"
-    tools:context=".ShowAllDocumentActivity">
+    tools:context=".documentsactivity.ShowAllDocumentActivity">
 
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical"
         tools:ignore="UselessParent">
-
-        <TextView
-            android:id="@+id/groupText"
-            android:textAlignment="center"
-            android:text="Danh sách các file đã được tải lên"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginTop="20dp"
-            android:textSize="20sp"
-            android:gravity="center"
-            android:textColor="@color/black"
-            android:textStyle="bold"
-            android:background="@drawable/baseline_button_background"
-            tools:ignore="HardcodedText"/>
 
         <LinearLayout
             android:id="@+id/linearLayout"
@@ -51,28 +37,27 @@
                 android:layout_gravity="center"
                 android:layout_marginStart="10dp"
                 android:textSize="25dp"
-                android:text="Số Lượng"
+                android:text="Số Số Đề Thi Hiện Có:"
                 android:textStyle="bold"
                 android:textColor="@color/black"/>
 
         </LinearLayout>
 
-        <com.google.android.material.card.MaterialCardView
-            android:background="@drawable/baseline_button_background"
-            android:id="@+id/materialCardView"
+        <androidx.appcompat.widget.SearchView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="5dp">
+            android:layout_marginStart="12dp"
+            android:layout_marginBottom="10dp"
+            android:layout_marginEnd="12dp"
+            android:id="@+id/searchData"
+            app:iconifiedByDefault="false"
+            app:searchHintIcon="@null"
+            app:queryHint="Search..."
+            android:focusable="false"
+            app:closeIcon="@drawable/icon_clear_24"
+            app:searchIcon="@drawable/icon_search_24"
+            android:background="@drawable/lavender_border"/>
 
-            <androidx.appcompat.widget.SearchView
-                android:id="@+id/searchView"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                app:iconifiedByDefault="false"
-                app:queryBackground="@android:color/transparent"
-                app:queryHint="Tìm kiếm ở đấy ..." />
-
-        </com.google.android.material.card.MaterialCardView>
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerView"
             android:layout_width="match_parent"

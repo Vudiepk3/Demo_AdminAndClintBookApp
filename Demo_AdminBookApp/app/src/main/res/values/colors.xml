@@ -5,4 +5,11 @@
     <color name="primary_color">#517593</color>
     <color name="secondary_color">#7b9bb6</color>
     <color name="red">#D22B2B</color>
+    <color name="lavender">#8692f7</color>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="green">#00ff00</color>
 </resources>

@@ -1,23 +1,28 @@
 package com.example.demo_bookapp;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.demo_bookapp.adapter.DocumentAdapter;
 import com.example.demo_bookapp.model.DocumentModel;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -30,81 +35,108 @@ import java.util.List;
 import java.util.Locale;
 
 public class ShowDocumentActivity extends AppCompatActivity {
-
-    private List<DocumentModel> mList = new ArrayList<>();
-    private DocumentAdapter documentAdapter;
-    private RecyclerView recyclerView;
-    private SearchView searchView;
-    private LinearLayout linearLayout;
-    private TextView txtNumberDocument;
+    FloatingActionButton fab; // Nút hành động nổi
+    DatabaseReference databaseReference; // Tham chiếu cơ sở dữ liệu Firebase
+    ValueEventListener eventListener; // Listener cho thay đổi dữ liệu
+    RecyclerView recyclerView; // RecyclerView để hiển thị danh sách tài liệu
+    List<DocumentModel> dataList; // Danh sách dữ liệu tài liệu
+    DocumentAdapter adapter; // Adapter cho RecyclerView
+    androidx.appcompat.widget.SearchView searchView; // Thanh tìm kiếm
+    TextView txtNumberImage; // TextView để hiển thị số lượng tài liệu
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_show_document);
-        loadDocument();
+        setContentView(R.layout.activity_show_document); // Đặt layout cho hoạt động
 
-    }
-    private void loadDocument() {
-        String subjectName = getIntent().getStringExtra("subjectName");
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        txtNumberDocument = (TextView) findViewById(R.id.txtNumberDocument);
+        recyclerView = findViewById(R.id.recyclerView); // Lấy đối tượng RecyclerView từ layout
 
-        DatabaseReference documentsRef = FirebaseDatabase.getInstance().getReference().child("documents");
-        Query query = documentsRef.orderByChild("subjectName").equalTo(subjectName);
+        searchView = findViewById(R.id.search); // Lấy đối tượng SearchView từ layout
+        searchView.clearFocus(); // Bỏ focus khỏi SearchView
 
-        FirebaseRecyclerOptions<DocumentModel> options =
-                new FirebaseRecyclerOptions.Builder<DocumentModel>()
-                        .setQuery(query, DocumentModel.class)
-                        .build();
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(ShowDocumentActivity.this, 1);
+        recyclerView.setLayoutManager(gridLayoutManager); // Đặt LayoutManager cho RecyclerView
 
-        documentAdapter = new DocumentAdapter(options);
-        recyclerView.setAdapter(documentAdapter);
-        documentAdapter.startListening();
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(ShowDocumentActivity.this);
+        builder.setCancelable(false); // Không cho phép hủy dialog khi nhấn ngoài
+        builder.setView(R.layout.progress_layout); // Đặt layout cho dialog
+        AlertDialog dialog = builder.create(); // Tạo dialog
+        dialog.show(); // Hiển thị dialog
 
-        query.addValueEventListener(new ValueEventListener() {
+
+        String subjectName = getIntent().getStringExtra("subjectName"); // Lấy tên môn học từ Intent
+        txtNumberImage = findViewById(R.id.txtNumberDocument); // Lấy đối tượng TextView từ layout
+
+        DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("documents");
+        categoryRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                long count = snapshot.getChildrenCount();
-                txtNumberDocument.setText("Số Lượng Đề Thi Hiện Có:" + count);
+                long count = 0; // Biến đếm số lượng tài liệu có cùng tên với subjectName
+                for (DataSnapshot itemSnapshot : snapshot.getChildren()) {
+                    DocumentModel dataClass = itemSnapshot.getValue(DocumentModel.class);
+                    if (dataClass != null && subjectName.equals(dataClass.getSubjectName())) {
+                        count++; // Tăng biến đếm khi tìm thấy tài liệu có tên môn học trùng khớp
+                    }
+                }
+                txtNumberImage.setText("Số Tài Liệu Hiện Có: " + count); // Hiển thị số lượng tài liệu
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                // Handle errors here
+                // Xử lý khi có lỗi
             }
         });
-    }
-    private void setSearchView(){
-        searchView = findViewById(R.id.searchView);
+
+        databaseReference = FirebaseDatabase.getInstance().getReference("documents");
+        dialog.show(); // Hiển thị dialog
+
+        dataList = new ArrayList<>(); // Khởi tạo danh sách dữ liệu
+        adapter = new DocumentAdapter(ShowDocumentActivity.this, dataList); // Khởi tạo adapter
+        recyclerView.setAdapter(adapter); // Đặt adapter cho RecyclerView
+        eventListener = databaseReference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                dataList.clear(); // Xóa dữ liệu cũ
+                for (DataSnapshot itemSnapshot: snapshot.getChildren()) {
+                    DocumentModel dataClass = itemSnapshot.getValue(DocumentModel.class); // Lấy dữ liệu từ Firebase
+                    if (dataClass != null && dataClass.getSubjectName() != null && dataClass.getSubjectName().equals(subjectName)) {
+                        dataList.add(dataClass); // Thêm dữ liệu mới vào danh sách
+                    }
+                }
+                adapter.notifyDataSetChanged(); // Thông báo cho adapter để cập nhật dữ liệu
+                dialog.dismiss(); // Đóng dialog
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                dialog.dismiss(); // Đóng dialog nếu có lỗi
+            }
+        });
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
             }
+
             @Override
             public boolean onQueryTextChange(String newText) {
-                filterList(newText);
+                searchList(newText); // Tìm kiếm danh sách tài liệu theo từ khóa
                 return true;
             }
         });
-
     }
-    private void filterList(String query) {
-        if (query != null) {
-            List<DocumentModel> filteredList = new ArrayList<>();
-            for (DocumentModel item : mList) {
-                if (item.getTitle().toLowerCase(Locale.ROOT).contains(query.toLowerCase(Locale.ROOT))) {
-                    filteredList.add(item);
-                }
-            }
-            if (filteredList.isEmpty()) {
-                Toast.makeText(this, "No Data found", Toast.LENGTH_SHORT).show();
-            } else {
-                documentAdapter.setFilteredList(filteredList);
+
+    public void searchList(String text) {
+        ArrayList<DocumentModel> searchList = new ArrayList<>(); // Danh sách kết quả tìm kiếm
+        for (DocumentModel dataClass : dataList) {
+            if (dataClass.getTitle().toLowerCase().contains(text.toLowerCase())) {
+                searchList.add(dataClass); // Thêm tài liệu vào danh sách kết quả nếu tiêu đề chứa từ khóa
             }
         }
+        if (searchList.isEmpty()) {
+            Toast.makeText(this, "Không tìm thấy tài liệu", Toast.LENGTH_SHORT).show(); // Hiển thị thông báo nếu không có tài liệu nào trong danh sách kết quả
+        }
+        adapter.searchDataList(searchList); // Cập nhật dữ liệu trong adapter
     }
-
 }

@@ -191,10 +191,11 @@
                                         android:layout_height="match_parent"
                                         app:iss_auto_cycle="true"
                                         app:iss_corner_radius="16"
-                                        app:iss_delay="2000"
-                                        app:iss_period="2000"
+                                        app:iss_delay="1500"
+                                        app:iss_period="1500"
                                         app:iss_title_background="@drawable/image_logo"
                                         tools:ignore="MissingClass" />
+
                                 </androidx.cardview.widget.CardView>
 
                                 <LinearLayout
