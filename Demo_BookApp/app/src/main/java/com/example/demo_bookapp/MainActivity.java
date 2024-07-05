@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBarDrawerToggle;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
@@ -91,9 +92,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
     }
 
     private void loadImageSlide() {
-        ProgressDialog pd = new ProgressDialog(this);
-        pd.setMessage("Loading....");
-        pd.show();
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(MainActivity.this);
+        builder.setCancelable(false); // Không cho phép hủy dialog khi nhấn ngoài
+        builder.setView(R.layout.progress_layout); // Đặt layout cho dialog
+        AlertDialog dialog = builder.create(); // Tạo dialog
+        dialog.show(); // Hiển thị dialog
 
         ImageSlider imageSlider = findViewById(R.id.ImageSlide);
         ArrayList<SlideModel> slideModels = new ArrayList<>();
@@ -132,13 +135,13 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                     }
                 });
 
-                pd.dismiss(); // Đóng ProgressDialog sau khi tải xong dữ liệu
+                dialog.dismiss(); // Đóng ProgressDialog sau khi tải xong dữ liệu
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                pd.dismiss(); // Đóng ProgressDialog nếu có lỗi
-                Toast.makeText(MainActivity.this, "Failed to load data.", Toast.LENGTH_SHORT).show(); // Thông báo lỗi tải dữ liệu
+                dialog.dismiss(); // Đóng ProgressDialog nếu có lỗi
+                Toast.makeText(MainActivity.this, "Lỗi trong việc tải dữ liệu.", Toast.LENGTH_SHORT).show(); // Thông báo lỗi tải dữ liệu
             }
         });
     }

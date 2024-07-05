@@ -167,7 +167,7 @@ public class ManageFilePDFActivity extends AppCompatActivity implements AdapterV
         dialog.show();
 
         // Tạo tham chiếu đến vị trí lưu trữ trên Firebase Storage với tên tệp duy nhất
-        StorageReference reference = storage.getReference().child("Upload/" + System.currentTimeMillis() + ".pdf");
+        StorageReference reference = storage.getReference().child("DocumentsUpload/" + System.currentTimeMillis() + ".pdf");
 
         // Bắt đầu quá trình tải lên tệp
         reference.putFile(fileUri)

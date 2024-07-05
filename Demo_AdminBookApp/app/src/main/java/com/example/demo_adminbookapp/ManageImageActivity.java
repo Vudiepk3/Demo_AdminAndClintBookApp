@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ManageImageActivity extends AppCompatActivity {
+
     FloatingActionButton fab;
     DatabaseReference databaseReference;
     ValueEventListener eventListener;
@@ -39,49 +40,57 @@ public class ManageImageActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_manage_image);
 
+        // Khởi tạo và ràng buộc RecyclerView và các thành phần giao diện khác
         recyclerView = findViewById(R.id.recyclerView);
         fab = findViewById(R.id.fab);
         searchView = findViewById(R.id.search);
         searchView.clearFocus();
 
+        // Thiết lập LayoutManager cho RecyclerView
         GridLayoutManager gridLayoutManager = new GridLayoutManager(ManageImageActivity.this, 1);
         recyclerView.setLayoutManager(gridLayoutManager);
 
+        // Hiển thị dialog tiến trình
         AlertDialog.Builder builder = new AlertDialog.Builder(ManageImageActivity.this);
         builder.setCancelable(false);
         builder.setView(R.layout.progress_layout);
         AlertDialog dialog = builder.create();
         dialog.show();
 
+        // Khởi tạo danh sách dữ liệu và Adapter cho RecyclerView
         dataList = new ArrayList<>();
-
         adapter = new ImageAdapter(ManageImageActivity.this, dataList);
         recyclerView.setAdapter(adapter);
-        txtNumberImage =(TextView) findViewById(R.id.txtNumberImage);
+
+        // Hiển thị số lượng ảnh hiện có
+        txtNumberImage = findViewById(R.id.txtNumberImage);
         DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("SlideImage");
         categoryRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 long count = snapshot.getChildrenCount();
                 txtNumberImage.setText("Số Ảnh Hiện Có: " + count);
+                dialog.dismiss();
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                dialog.dismiss();
             }
         });
+
+        // Lắng nghe sự kiện thay đổi dữ liệu trên Firebase Realtime Database
         databaseReference = FirebaseDatabase.getInstance().getReference("SlideImage");
-        dialog.show();
         eventListener = databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 dataList.clear();
-                for (DataSnapshot itemSnapshot: snapshot.getChildren()){
+                for (DataSnapshot itemSnapshot : snapshot.getChildren()) {
                     ImageModel dataClass = itemSnapshot.getValue(ImageModel.class);
-
-                    dataClass.setKey(itemSnapshot.getKey());
-
-                    dataList.add(dataClass);
+                    if (dataClass != null) {
+                        dataClass.setKey(itemSnapshot.getKey());
+                        dataList.add(dataClass);
+                    }
                 }
                 adapter.notifyDataSetChanged();
                 dialog.dismiss();
@@ -93,6 +102,7 @@ public class ManageImageActivity extends AppCompatActivity {
             }
         });
 
+        // Xử lý tìm kiếm ảnh
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -106,6 +116,7 @@ public class ManageImageActivity extends AppCompatActivity {
             }
         });
 
+        // Xử lý sự kiện click vào Floating Action Button (FAB) để tải lên ảnh mới
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,20 +124,25 @@ public class ManageImageActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-
     }
-    public void searchList(String text){
+
+    // Phương thức để tìm kiếm ảnh trong danh sách hiện tại
+    public void searchList(String text) {
         ArrayList<ImageModel> searchList = new ArrayList<>();
-        for (ImageModel dataClass: dataList){
-            if (dataClass.getNameImage().toLowerCase().contains(text.toLowerCase())){
+        for (ImageModel dataClass : dataList) {
+            if (dataClass.getNameImage().toLowerCase().contains(text.toLowerCase())) {
                 searchList.add(dataClass);
             }
         }
         adapter.searchDataList(searchList);
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        databaseReference.removeEventListener(eventListener);
+        // Hủy đăng ký lắng nghe sự kiện khi Activity bị hủy
+        if (databaseReference != null && eventListener != null) {
+            databaseReference.removeEventListener(eventListener);
+        }
     }
 }

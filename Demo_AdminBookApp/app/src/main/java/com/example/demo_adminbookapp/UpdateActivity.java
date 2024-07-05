@@ -31,6 +31,7 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
 public class UpdateActivity extends AppCompatActivity {
+
     ImageView updateUrlImage;
     Button updateButton;
     EditText updateNameImage, updateLinkWeb, updateNoteImage;
@@ -40,17 +41,20 @@ public class UpdateActivity extends AppCompatActivity {
     Uri uri;
     DatabaseReference databaseReference;
     StorageReference storageReference;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_update);
+
+        // Ánh xạ và thiết lập các thành phần giao diện
         updateButton = findViewById(R.id.updateButton);
         updateUrlImage = findViewById(R.id.updateUrlImage);
         updateNameImage = findViewById(R.id.updateNameImage);
         updateLinkWeb = findViewById(R.id.updateLinkWeb);
         updateNoteImage = findViewById(R.id.updateNoteImage);
 
+        // Đăng ký ActivityResultLauncher để chọn hình ảnh từ thư viện
         ActivityResultLauncher<Intent> activityResultLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 new ActivityResultCallback<ActivityResult>() {
@@ -66,6 +70,8 @@ public class UpdateActivity extends AppCompatActivity {
                     }
                 }
         );
+
+        // Lấy dữ liệu từ Intent và hiển thị lên giao diện
         Bundle bundle = getIntent().getExtras();
         if (bundle != null){
             Glide.with(UpdateActivity.this).load(bundle.getString("UrlImage")).into(updateUrlImage);
@@ -75,7 +81,8 @@ public class UpdateActivity extends AppCompatActivity {
             key = bundle.getString("Key");
             oldImageURL = bundle.getString("Image");
         }
-        databaseReference = FirebaseDatabase.getInstance().getReference("SlideImage").child(key);
+
+        // Thay đổi hình ảnh khi click vào ImageView để chọn hình ảnh mới
         updateUrlImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -84,29 +91,38 @@ public class UpdateActivity extends AppCompatActivity {
                 activityResultLauncher.launch(photoPicker);
             }
         });
+
+        // Xử lý sự kiện khi click vào nút Update
         updateButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Lưu dữ liệu và cập nhật vào Firebase
                 saveData();
-                Intent intent = new Intent(UpdateActivity.this, ManageImageActivity.class);
-                startActivity(intent);
             }
         });
     }
+
+    // Phương thức để lưu dữ liệu và upload hình ảnh lên Firebase Storage
     public void saveData(){
+        // Tạo tham chiếu đến thư mục trên Firebase Storage và hiển thị dialog tiến trình
         storageReference = FirebaseStorage.getInstance().getReference().child("Slide Image").child(uri.getLastPathSegment());
         AlertDialog.Builder builder = new AlertDialog.Builder(UpdateActivity.this);
         builder.setCancelable(false);
         builder.setView(R.layout.progress_layout);
         AlertDialog dialog = builder.create();
         dialog.show();
+
+        // Upload hình ảnh lên Firebase Storage
         storageReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                // Lấy đường dẫn URL của hình ảnh đã upload
                 Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
                 while (!uriTask.isComplete());
                 Uri urlImage = uriTask.getResult();
                 imageUrl = urlImage.toString();
+
+                // Sau khi upload hình ảnh, cập nhật dữ liệu trên Firebase Realtime Database
                 updateData();
                 dialog.dismiss();
             }
@@ -117,18 +133,25 @@ public class UpdateActivity extends AppCompatActivity {
             }
         });
     }
+
+    // Phương thức để cập nhật dữ liệu lên Firebase Realtime Database
     public void updateData(){
+        // Lấy các giá trị từ các EditText
         nameImage = updateNameImage.getText().toString().trim();
         linkWeb = updateLinkWeb.getText().toString().trim();
         noteImage = updateNoteImage.getText().toString().trim();
 
+        // Tạo đối tượng ImageModel mới và cập nhật dữ liệu
         ImageModel dataClass = new ImageModel(imageUrl, nameImage, linkWeb, noteImage);
         databaseReference.setValue(dataClass).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
                 if (task.isSuccessful()){
+                    // Xóa hình ảnh cũ từ Firebase Storage
                     StorageReference reference = FirebaseStorage.getInstance().getReferenceFromUrl(oldImageURL);
                     reference.delete();
+
+                    // Hiển thị thông báo cập nhật thành công và kết thúc Activity
                     Toast.makeText(UpdateActivity.this, "Updated", Toast.LENGTH_SHORT).show();
                     finish();
                 }

@@ -41,6 +41,7 @@ public class ViewPDFActivity extends AppCompatActivity {
     ProgressBar progressBar;
     private long downloadId;
     private BroadcastReceiver onDownloadComplete;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +55,8 @@ public class ViewPDFActivity extends AppCompatActivity {
         setupDownloadButton();
         registerDownloadReceiver();
     }
+
+    // Khởi tạo WebView để hiển thị PDF từ URL
     private void initializeWebView() {
         pdfview.getSettings().setJavaScriptEnabled(true);
 
@@ -88,6 +91,8 @@ public class ViewPDFActivity extends AppCompatActivity {
 
         loadPdfFile(fileurl);
     }
+
+    // Load file PDF từ URL vào WebView sử dụng Google Docs Viewer
     private void loadPdfFile(String fileurl) {
         try {
             String encodedUrl = URLEncoder.encode(fileurl, "UTF-8");
@@ -97,6 +102,8 @@ public class ViewPDFActivity extends AppCompatActivity {
             Toast.makeText(this, "Error loading PDF", Toast.LENGTH_SHORT).show();
         }
     }
+
+    // Thiết lập nút Download để tải xuống PDF
     private void setupDownloadButton() {
         btnDownload.setOnClickListener(v -> {
             String filename = getIntent().getStringExtra("title");
@@ -108,6 +115,8 @@ public class ViewPDFActivity extends AppCompatActivity {
             }
         });
     }
+
+    // Đăng ký BroadcastReceiver để nhận thông báo khi tải xuống hoàn tất
     private void registerDownloadReceiver() {
         onDownloadComplete = new BroadcastReceiver() {
             @Override
@@ -140,6 +149,8 @@ public class ViewPDFActivity extends AppCompatActivity {
 
         registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
     }
+
+    // Phương thức để tải xuống file PDF
     private void downloadFile(Context context, String pdfLink, String fileName) {
         try {
             DownloadManager downloadManager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
@@ -164,6 +175,8 @@ public class ViewPDFActivity extends AppCompatActivity {
             Toast.makeText(this, "Error downloading PDF: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
+
+    // Xử lý khi người dùng trả lời yêu cầu cấp quyền
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -179,6 +192,8 @@ public class ViewPDFActivity extends AppCompatActivity {
             }
         }
     }
+
+    // Hủy đăng ký BroadcastReceiver khi Activity bị hủy
     @Override
     protected void onDestroy() {
         super.onDestroy();
