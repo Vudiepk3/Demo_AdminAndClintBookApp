@@ -9,7 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
-import com.example.demo_adminbookapp.DetailActivity;
+import com.example.demo_adminbookapp.DetailImageActivity;
 import com.example.demo_adminbookapp.R;
 import com.example.demo_adminbookapp.model.ImageModel;
 
@@ -48,13 +48,12 @@ public class ImageAdapter extends RecyclerView.Adapter<MyViewHolder> {
         holder.recCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(context, DetailActivity.class);
+                Intent intent = new Intent(context, DetailImageActivity.class);
                 intent.putExtra("UrlImage", dataList.get(holder.getAdapterPosition()).getUrlImage());
                 intent.putExtra("NameImage", dataList.get(holder.getAdapterPosition()).getNameImage());
                 intent.putExtra("LinkWeb", dataList.get(holder.getAdapterPosition()).getLinkWeb());
                 intent.putExtra("NoteImage", dataList.get(holder.getAdapterPosition()).getNoteImage());
                 intent.putExtra("Key", dataList.get(holder.getAdapterPosition()).getKey());
-
                 context.startActivity(intent);
             }
         });

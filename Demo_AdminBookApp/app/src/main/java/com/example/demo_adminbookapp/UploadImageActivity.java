@@ -33,7 +33,7 @@ import com.google.firebase.storage.UploadTask;
 import java.text.DateFormat;
 import java.util.Calendar;
 
-public class UploadActivity extends AppCompatActivity {
+public class UploadImageActivity extends AppCompatActivity {
 
     ImageView uploadUrlImage;
     Button saveButton;
@@ -44,7 +44,7 @@ public class UploadActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_upload);
+        setContentView(R.layout.activity_upload_image);
 
         // Ánh xạ và thiết lập các thành phần giao diện
         uploadUrlImage = findViewById(R.id.uploadUrlImage);
@@ -64,7 +64,7 @@ public class UploadActivity extends AppCompatActivity {
                             uri = data.getData();
                             uploadUrlImage.setImageURI(uri);
                         } else {
-                            Toast.makeText(UploadActivity.this, "No Image Selected", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(UploadImageActivity.this, "Không chọn ảnh nào", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }
@@ -87,22 +87,20 @@ public class UploadActivity extends AppCompatActivity {
                 try {
                     saveData();
                 } catch (Exception e) {
-                    Toast.makeText(UploadActivity.this, "Lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(UploadImageActivity.this, "Lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
                 }
                 finish();
             }
         });
     }
-
     // Phương thức để lưu dữ liệu lên Firebase
     public void saveData(){
-
         // Tham chiếu đến thư mục trên Firebase Storage để lưu hình ảnh
         StorageReference storageReference = FirebaseStorage.getInstance().getReference().child("Slide Images")
                 .child(uri.getLastPathSegment());
 
         // Hiển thị dialog tiến trình
-        AlertDialog.Builder builder = new AlertDialog.Builder(UploadActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(UploadImageActivity.this);
         builder.setCancelable(false);
         builder.setView(R.layout.progress_layout);
         AlertDialog dialog = builder.create();
@@ -112,13 +110,11 @@ public class UploadActivity extends AppCompatActivity {
         storageReference.putFile(uri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-
                 // Lấy đường dẫn URL của hình ảnh đã upload
                 Task<Uri> uriTask = taskSnapshot.getStorage().getDownloadUrl();
                 while (!uriTask.isComplete());
                 Uri urlImage = uriTask.getResult();
                 imageURL = urlImage.toString();
-
                 // Gọi phương thức để upload dữ liệu lên Firebase Realtime Database
                 uploadData();
                 dialog.dismiss();
@@ -138,9 +134,10 @@ public class UploadActivity extends AppCompatActivity {
         String nameImage = uploadNameImage.getText().toString().trim();
         String linkWeb = uploadLinkWeb.getText().toString().trim();
         String noteImage = uploadNoteImage.getText().toString().trim();
-        nameImage = nameImage.isEmpty() ? "No Name Image" : nameImage;
-        linkWeb = linkWeb.isEmpty() ? "No Link Web" : linkWeb;
-        noteImage = noteImage.isEmpty() ? "No Note Image" : noteImage;
+
+        nameImage = nameImage.isEmpty() ? "Không có tên ảnh" : nameImage;
+        linkWeb = linkWeb.isEmpty() ? "Không có link web" : linkWeb;
+        noteImage = noteImage.isEmpty() ? "Khoogn có ghi chú" : noteImage;
 
         // Tạo đối tượng ImageModel mới và đẩy lên Firebase Realtime Database
         ImageModel dataClass = new ImageModel(imageURL, nameImage, linkWeb, noteImage);
@@ -152,23 +149,23 @@ public class UploadActivity extends AppCompatActivity {
                 .setValue(dataClass).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-
-                            // Hiển thị thông báo lưu thành công và kết thúc Activity sau 1 giây
-                            new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(UploadActivity.this, "Đã lưu thành công", Toast.LENGTH_SHORT).show();
-                                    finish();
-                                }
-                            }, 1000);
-
+                        if (task.isSuccessful()) {
+                            Toast.makeText(UploadImageActivity.this, "Đã lưu thành công", Toast.LENGTH_SHORT).show();// Hiển thị thông báo lưu thành công và kết thúc Activity sau 1 giây
                         }
+                        else {
+                            Toast.makeText(UploadImageActivity.this, "Lỗi trong quá trình cập nhật thông tin", Toast.LENGTH_SHORT).show();
+                        }
+                        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                            @Override
+                            public void run() {
+                                finish();
+                            }
+                        }, 2000);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(UploadActivity.this, e.getMessage().toString(), Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UploadImageActivity.this, e.getMessage().toString(), Toast.LENGTH_SHORT).show();
                     }
                 });
     }

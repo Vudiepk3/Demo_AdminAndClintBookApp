@@ -7,9 +7,9 @@ import androidx.appcompat.widget.SearchView;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.TextView;
 
 import com.example.demo_adminbookapp.adapter.ImageAdapter;
@@ -66,11 +66,11 @@ public class ManageImageActivity extends AppCompatActivity {
         txtNumberImage = findViewById(R.id.txtNumberImage);
         DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("SlideImage");
         categoryRef.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 long count = snapshot.getChildrenCount();
                 txtNumberImage.setText("Số Ảnh Hiện Có: " + count);
-                dialog.dismiss();
             }
 
             @Override
@@ -82,6 +82,7 @@ public class ManageImageActivity extends AppCompatActivity {
         // Lắng nghe sự kiện thay đổi dữ liệu trên Firebase Realtime Database
         databaseReference = FirebaseDatabase.getInstance().getReference("SlideImage");
         eventListener = databaseReference.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 dataList.clear();
@@ -117,12 +118,9 @@ public class ManageImageActivity extends AppCompatActivity {
         });
 
         // Xử lý sự kiện click vào Floating Action Button (FAB) để tải lên ảnh mới
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(ManageImageActivity.this, UploadActivity.class);
-                startActivity(intent);
-            }
+        fab.setOnClickListener(view -> {
+            Intent intent = new Intent(ManageImageActivity.this, UploadImageActivity.class);
+            startActivity(intent);
         });
     }
 
@@ -138,9 +136,28 @@ public class ManageImageActivity extends AppCompatActivity {
     }
 
     @Override
+    protected void onResume() {
+        super.onResume();
+        // Đăng ký lại eventListener khi Activity trở lại hoạt động
+        if (databaseReference != null && eventListener != null) {
+            databaseReference.addValueEventListener(eventListener);
+            // Hoặc addListenerForSingleValueEvent() nếu chỉ cần tải dữ liệu một lần
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Hủy đăng ký eventListener khi Activity tạm dừng để tránh rò rỉ bộ nhớ
+        if (databaseReference != null && eventListener != null) {
+            databaseReference.removeEventListener(eventListener);
+        }
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
-        // Hủy đăng ký lắng nghe sự kiện khi Activity bị hủy
+        // Hủy đăng ký eventListener khi Activity bị hủy để tránh rò rỉ bộ nhớ
         if (databaseReference != null && eventListener != null) {
             databaseReference.removeEventListener(eventListener);
         }

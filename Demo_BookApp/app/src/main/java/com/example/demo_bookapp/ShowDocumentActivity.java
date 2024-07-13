@@ -1,41 +1,30 @@
 package com.example.demo_bookapp;
 
-import android.content.Intent;
+
+import android.annotation.SuppressLint;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.demo_bookapp.adapter.DocumentAdapter;
 import com.example.demo_bookapp.model.DocumentModel;
-import com.firebase.ui.database.FirebaseRecyclerOptions;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.Query;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 public class ShowDocumentActivity extends AppCompatActivity {
-    FloatingActionButton fab; // Nút hành động nổi
     DatabaseReference databaseReference; // Tham chiếu cơ sở dữ liệu Firebase
     ValueEventListener eventListener; // Listener cho thay đổi dữ liệu
     RecyclerView recyclerView; // RecyclerView để hiển thị danh sách tài liệu
@@ -69,13 +58,17 @@ public class ShowDocumentActivity extends AppCompatActivity {
 
         DatabaseReference categoryRef = FirebaseDatabase.getInstance().getReference().child("documents");
         categoryRef.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("SetTextI18n")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 long count = 0; // Biến đếm số lượng tài liệu có cùng tên với subjectName
                 for (DataSnapshot itemSnapshot : snapshot.getChildren()) {
                     DocumentModel dataClass = itemSnapshot.getValue(DocumentModel.class);
-                    if (dataClass != null && subjectName.equals(dataClass.getSubjectName())) {
-                        count++; // Tăng biến đếm khi tìm thấy tài liệu có tên môn học trùng khớp
+                    if (dataClass != null) {
+                        assert subjectName != null;
+                        if (subjectName.equals(dataClass.getSubjectName())) {
+                            count++; // Tăng biến đếm khi tìm thấy tài liệu có tên môn học trùng khớp
+                        }
                     }
                 }
                 txtNumberImage.setText("Số Tài Liệu Hiện Có: " + count); // Hiển thị số lượng tài liệu
@@ -94,6 +87,7 @@ public class ShowDocumentActivity extends AppCompatActivity {
         adapter = new DocumentAdapter(ShowDocumentActivity.this, dataList); // Khởi tạo adapter
         recyclerView.setAdapter(adapter); // Đặt adapter cho RecyclerView
         eventListener = databaseReference.addValueEventListener(new ValueEventListener() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 dataList.clear(); // Xóa dữ liệu cũ
@@ -139,4 +133,5 @@ public class ShowDocumentActivity extends AppCompatActivity {
         }
         adapter.searchDataList(searchList); // Cập nhật dữ liệu trong adapter
     }
+
 }

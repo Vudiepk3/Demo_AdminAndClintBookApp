@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.demo_adminbookapp.R;
-import com.example.demo_adminbookapp.documentsactivity.ViewPDFActivity;
+import com.example.demo_adminbookapp.documentsactivity.ViewDocumentActivity;
 import com.example.demo_adminbookapp.model.DocumentModel;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
@@ -35,7 +35,7 @@ public class DocumentAdapter extends FirebaseRecyclerAdapter<DocumentModel, Docu
         holder.readBook.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(holder.readBook.getContext(), ViewPDFActivity.class);
+                Intent intent = new Intent(holder.readBook.getContext(), ViewDocumentActivity.class);
                 intent.putExtra("title", model.getTitle());
                 intent.putExtra("pdf", model.getLinkDocument());
                 holder.readBook.getContext().startActivity(intent);
@@ -93,7 +93,7 @@ public class DocumentAdapter extends FirebaseRecyclerAdapter<DocumentModel, Docu
 
     @NonNull
     public CategoryViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_file, parent, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_document, parent, false);
         return new CategoryViewHolder(view);
     }
 

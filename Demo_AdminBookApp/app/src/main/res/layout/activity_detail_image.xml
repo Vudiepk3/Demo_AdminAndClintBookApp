@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".DetailActivity">
+    tools:context=".DetailImageActivity">
 
     <ImageView
         android:layout_width="match_parent"
@@ -15,7 +15,7 @@
         android:id="@+id/detailUrlImage"
         android:padding="8dp"
         android:layout_gravity="center"
-        android:src="@drawable/picture"
+        android:src="@drawable/image_picture"
         android:scaleType="fitXY"/>
 
     <TextView
@@ -27,7 +27,7 @@
         android:textSize="20sp"
         android:layout_gravity="center"
         android:padding="16dp"
-        android:background="@drawable/lavender_border"
+        android:background="@drawable/baseline_lavender_border"
         android:textColor="@color/lavender"/>
 
     <TextView
@@ -41,7 +41,7 @@
         android:layout_gravity="center"
         android:id="@+id/detailLinkWeb"
         android:textSize="18sp"
-        android:background="@drawable/lavender_border"
+        android:background="@drawable/baseline_lavender_border"
         android:textColor="@color/lavender"/>
 
     <TextView
@@ -54,7 +54,7 @@
         android:layout_gravity="center"
         android:id="@+id/detailNoteImage"
         android:textSize="18sp"
-        android:background="@drawable/lavender_border"
+        android:background="@drawable/baseline_lavender_border"
         android:textColor="@color/lavender"/>
 
     <RelativeLayout

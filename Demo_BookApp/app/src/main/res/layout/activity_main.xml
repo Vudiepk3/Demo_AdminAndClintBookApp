@@ -20,7 +20,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@drawable/image_background"
-            android:id="@+id/fragment_container">
+            android:id="@+id/fragment_container"
+            tools:ignore="UselessParent">
 
             <androidx.coordinatorlayout.widget.CoordinatorLayout
                 android:layout_width="match_parent"
@@ -626,7 +627,6 @@
         app:headerLayout="@layout/nav_header"
         app:menu="@menu/menu_nav"
         android:background="@color/white"
-        app:itemIconTint="@color/lavender"
-        app:itemTextColor="@color/lavender"/>
-
+        app:itemIconTint="@color/black"
+        app:itemTextColor="@color/black"/>
 </androidx.drawerlayout.widget.DrawerLayout>

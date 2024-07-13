@@ -1,10 +1,10 @@
 package com.example.demo_bookapp;
 
-import android.app.ProgressDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -15,6 +15,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.cardview.widget.CardView;
+import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.denzcoskun.imageslider.ImageSlider;
@@ -33,10 +34,6 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private DrawerLayout drawerLayout; // Layout của navigation drawer
-    private DatabaseReference databaseReference; // Tham chiếu cơ sở dữ liệu Firebase
-    private ValueEventListener eventListener; // Listener cho thay đổi dữ liệu
-    private final ArrayList<CardView> cardViews = new ArrayList<>(); // Danh sách các CardView
-    private List<ImageModel> dataList;
     private final String[] subjectNames = {
             "Toán Học",
             "Văn Học",
@@ -59,18 +56,6 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
             R.id.geographyCard,
             R.id.civicEducationCard
     }; // Danh sách các ID của CardView tương ứng với các môn học
-
-    private final int[] imageResIds = {
-            R.drawable.image_maths,
-            R.drawable.image_literature,
-            R.drawable.image_english,
-            R.drawable.image_physics,
-            R.drawable.image_chemistry,
-            R.drawable.image_biology,
-            R.drawable.image_history,
-            R.drawable.image_geography,
-            R.drawable.image_civiceducation
-    }; // Danh sách các tài nguyên hình ảnh tương ứng với các môn học
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +87,8 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         ArrayList<SlideModel> slideModels = new ArrayList<>();
         List<String> linkWebsites = new ArrayList<>(); // Danh sách lưu trữ các link website
 
-        databaseReference = FirebaseDatabase.getInstance().getReference("SlideImage");
+        // Tham chiếu cơ sở dữ liệu Firebase
+        DatabaseReference databaseReference = FirebaseDatabase.getInstance().getReference("SlideImage");
         databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
@@ -134,8 +120,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
                         }
                     }
                 });
-
-                dialog.dismiss(); // Đóng ProgressDialog sau khi tải xong dữ liệu
+                new Handler().postDelayed(() -> {
+                    if (dialog.isShowing()) {
+                        dialog.dismiss(); // Đóng dialog sau khi tải xong dữ liệu
+                    }
+                }, 2000);
             }
 
             @Override
@@ -150,11 +139,11 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         for (int i = 0; i < cardViewIds.length; i++) {
             CardView cardView = findViewById(cardViewIds[i]); // Lấy đối tượng CardView tương ứng với môn học
             final int index = i; // Lưu index cho OnClickListener
-            cardView.setOnClickListener(v -> navigateToSubject(imageResIds[index], subjectNames[index])); // Đặt OnClickListener cho CardView để điều hướng đến môn học tương ứng
+            cardView.setOnClickListener(v -> navigateToSubject(subjectNames[index])); // Đặt OnClickListener cho CardView để điều hướng đến môn học tương ứng
         }
     }
 
-    private void navigateToSubject(int imageResId, String subjectName) {
+    private void navigateToSubject(String subjectName) {
         Intent subjectActivity = new Intent(MainActivity.this, ShowDocumentActivity.class); // Tạo Intent để điều hướng đến ShowDocumentActivity
         subjectActivity.putExtra("subjectName", subjectName); // Truyền tên môn học qua Intent
         startActivity(subjectActivity); // Bắt đầu hoạt động mới
@@ -162,8 +151,48 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        // Xử lý sự kiện chọn item trong NavigationView
+        int itemId = item.getItemId();
+        if (itemId == R.id.nav_vote) {
+            openLink();
+        } else if (itemId == R.id.nav_share) {
+            shareApplication();
+        } else if (itemId == R.id.nav_feedback) {
+            sendFeedback();
+        }
+        drawerLayout.closeDrawer(GravityCompat.START);
         return false;
+    }
+    private void openLink() {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=com.dhcn.MyHAUI&pcampaignid=web_share"));
+            startActivity(intent);
+        } catch (Exception e) {
+            Toast.makeText(this, "Lỗi", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void shareApplication() {
+        try {
+            Intent intent = new Intent(Intent.ACTION_SEND);
+            intent.setType("text/plain");
+            intent.putExtra(Intent.EXTRA_SUBJECT, "My application name");
+            intent.putExtra(Intent.EXTRA_TEXT, "This is my text");
+            startActivity(Intent.createChooser(intent, "Hãy chia sẻ đến với mọi người"));
+        } catch (Exception e) {
+            Toast.makeText(this, "Lỗi", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void sendFeedback() {
+        try {
+            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("mailto:vulq2k3@gmail.com"));
+            intent.putExtra(Intent.EXTRA_SUBJECT, "Xin Chào");
+            intent.putExtra(Intent.EXTRA_TEXT, "Hi");
+            startActivity(Intent.createChooser(intent, "Send mail..."));
+        } catch (Exception e) {
+            Toast.makeText(this, "Lỗi", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -171,11 +200,14 @@ public class MainActivity extends AppCompatActivity implements NavigationView.On
         getMenuInflater().inflate(R.menu.menu_options, menu); // Inflate menu từ tài nguyên menu_options
         return true;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+        if (id == R.id.action_notifications) {
+            Toast.makeText(this, "Chức năng đang trong quá trình phát triển", Toast.LENGTH_SHORT).show();
+        }
         // Xử lý sự kiện chọn item trong menu
         return super.onOptionsItemSelected(item);
     }
+
 }

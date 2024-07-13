@@ -18,7 +18,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.documentfile.provider.DocumentFile;
 
 import com.example.demo_adminbookapp.R;
-import com.example.demo_adminbookapp.databinding.ActivityManageFilePdfactivityBinding;
+import com.example.demo_adminbookapp.databinding.ActivityUploadDocumentBinding;
 import com.example.demo_adminbookapp.model.DocumentModel;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.storage.FirebaseStorage;
@@ -30,9 +30,9 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
-public class ManageFilePDFActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
+public class UploadDocumentActivity extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
     // Ràng buộc các thành phần giao diện
-    ActivityManageFilePdfactivityBinding binding;
+    ActivityUploadDocumentBinding binding;
 
     // Khởi tạo Firebase storage và database
     FirebaseStorage storage;
@@ -57,7 +57,7 @@ public class ManageFilePDFActivity extends AppCompatActivity implements AdapterV
         super.onCreate(savedInstanceState);
 
         // Ràng buộc giao diện
-        binding = ActivityManageFilePdfactivityBinding.inflate(getLayoutInflater());
+        binding = ActivityUploadDocumentBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         // Khởi tạo các thành phần Firebase
@@ -65,7 +65,7 @@ public class ManageFilePDFActivity extends AppCompatActivity implements AdapterV
         storage = FirebaseStorage.getInstance();
 
         // Thiết lập click listener để chọn tệp PDF
-        binding.dataTransfer.setOnClickListener(new View.OnClickListener() {
+        binding.uploadDocument.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 requestStoragePermission();
@@ -96,25 +96,7 @@ public class ManageFilePDFActivity extends AppCompatActivity implements AdapterV
                 }
             }
         });
-
-        // Thiết lập click listener để hủy chọn
-        binding.cancle.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                resetViews();
-            }
-        });
-        binding.btnShow.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent showAllDocumentActivity = new Intent(ManageFilePDFActivity.this, ShowAllDocumentActivity.class);
-                startActivity(showAllDocumentActivity);
-            }
-
-        });
-
     }
-
     // Launcher để chọn tệp PDF
     private ActivityResultLauncher<String> launcher = registerForActivityResult(
             new ActivityResultContracts.GetContent(),
@@ -123,23 +105,18 @@ public class ManageFilePDFActivity extends AppCompatActivity implements AdapterV
                 public void onActivityResult(Uri uri) {
                     pdfFileUri = uri;
                     if ((uri != null)) {
-                        assert DocumentFile.fromSingleUri(ManageFilePDFActivity.this, uri) != null;
-                        fileName = DocumentFile.fromSingleUri(ManageFilePDFActivity.this, uri).getName();
+                        assert DocumentFile.fromSingleUri(UploadDocumentActivity.this, uri) != null;
+                        fileName = DocumentFile.fromSingleUri(UploadDocumentActivity.this, uri).getName();
                     } else {
                         fileName = null;
                     }
                     binding.editTitle.setText(fileName != null ? fileName : "");
-                    if (uri != null) {
-                        binding.pdfLogo.setVisibility(View.GONE);
-                        binding.cancle.setVisibility(View.VISIBLE);
-                        binding.dataTransfer.setVisibility(View.VISIBLE);
-                    }
                 }
             });
 
     // Yêu cầu quyền truy cập bộ nhớ
     private void requestStoragePermission() {
-        Dexter.withContext(ManageFilePDFActivity.this)
+        Dexter.withContext(UploadDocumentActivity.this)
                 .withPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
                 .withListener(new PermissionListener() {
                     @Override
@@ -185,9 +162,6 @@ public class ManageFilePDFActivity extends AppCompatActivity implements AdapterV
                         // Đóng hộp thoại tiến trình và thông báo cho người dùng rằng tệp đã được tải lên thành công
                         dialog.dismiss();
                         showToast("Tệp đã được tải lên");
-
-                        // Đặt lại giao diện người dùng
-                        resetViews();
                     });
                 })
                 // Theo dõi tiến trình tải lên và cập nhật hộp thoại tiến trình
@@ -198,18 +172,9 @@ public class ManageFilePDFActivity extends AppCompatActivity implements AdapterV
                 });
     }
 
-    // Đặt lại các thành phần giao diện sau khi chọn hoặc hủy
-    private void resetViews() {
-        binding.pdfLogo.setVisibility(View.VISIBLE);
-        binding.cancle.setVisibility(View.GONE);
-        binding.dataTransfer.setVisibility(View.VISIBLE);
-        binding.editTitle.setText("");
-        pdfFileUri = null;
-    }
-
     // Hiển thị thông báo toast
     private void showToast(String message) {
-        Toast.makeText(ManageFilePDFActivity.this, message, Toast.LENGTH_SHORT).show();
+        Toast.makeText(UploadDocumentActivity.this, message, Toast.LENGTH_SHORT).show();
     }
 
     @Override

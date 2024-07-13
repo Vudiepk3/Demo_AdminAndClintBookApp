@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".UploadActivity">
+    tools:context=".UploadImageActivity">
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
@@ -23,12 +23,12 @@
             android:orientation="vertical"
             android:layout_gravity="center_horizontal"
             android:padding="20dp"
-            android:background="@drawable/lavender_border">
+            android:background="@drawable/baseline_lavender_border">
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Upload Data"
+                android:text="Upload Image"
                 android:textSize="30sp"
                 android:textAlignment="center"
                 android:textColor="@color/lavender"/>
@@ -36,7 +36,7 @@
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="200dp"
-                android:src="@drawable/picture"
+                android:src="@drawable/image_picture"
                 android:id="@+id/uploadUrlImage"
                 android:layout_marginTop="10dp"
                 android:scaleType="fitXY"/>
@@ -45,7 +45,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:id="@+id/uploadNameImage"
-                android:background="@drawable/lavender_border"
+                android:background="@drawable/baseline_lavender_border"
                 android:layout_marginTop="20dp"
                 android:padding="16dp"
                 android:hint="Enter name imgae"
@@ -56,7 +56,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="80dp"
                 android:id="@+id/uploadLinkWeb"
-                android:background="@drawable/lavender_border"
+                android:background="@drawable/baseline_lavender_border"
                 android:layout_marginTop="20dp"
                 android:padding="16dp"
                 android:hint="Enter link web"
@@ -67,7 +67,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:id="@+id/uploadNoteImage"
-                android:background="@drawable/lavender_border"
+                android:background="@drawable/baseline_lavender_border"
                 android:layout_marginTop="20dp"
                 android:padding="16dp"
                 android:hint="Enter note image"

@@ -1,6 +1,7 @@
 package com.example.demo_bookapp;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.DownloadManager;
 import android.app.ProgressDialog;
@@ -11,6 +12,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.webkit.WebView;
@@ -24,7 +26,6 @@ import androidx.core.content.ContextCompat;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.github.clans.fab.FloatingActionButton;
-
 import java.io.File;
 
 public class ViewPDFActivity extends AppCompatActivity {
@@ -53,10 +54,10 @@ public class ViewPDFActivity extends AppCompatActivity {
         registerDownloadReceiver();
     }
 
+    @SuppressLint("SetJavaScriptEnabled")
     private void initializeWebView() {
         pdfView.getSettings().setJavaScriptEnabled(true);
 
-        String filename = getIntent().getStringExtra("title");
         fileUrl = getIntent().getStringExtra("pdf");
 
         pdfView.setWebViewClient(new WebViewClient() {
@@ -74,10 +75,10 @@ public class ViewPDFActivity extends AppCompatActivity {
         try {
             String encodedUrl = Uri.encode(fileUrl);
             pdfView.loadUrl("http://docs.google.com/gview?embedded=true&url=" + encodedUrl);
-            showProgressDialog("Opening PDF...");
+            showProgressDialog("Đang mở tài liệu...");
         } catch (Exception ex) {
             ex.printStackTrace();
-            Toast.makeText(this, "Error loading PDF", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Lỗi", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -129,12 +130,12 @@ public class ViewPDFActivity extends AppCompatActivity {
                     Uri downloadUri = downloadManager.getUriForDownloadedFile(downloadId);
                     if (downloadUri != null) {
                         String filePath = downloadUri.getPath();
-                        Snackbar.make(findViewById(android.R.id.content), "Download completed", Snackbar.LENGTH_LONG)
+                        Snackbar.make(findViewById(android.R.id.content), "Tải xuống thành công", Snackbar.LENGTH_LONG)
                                 .addCallback(new Snackbar.Callback() {
                                     @Override
                                     public void onDismissed(Snackbar snackbar, int event) {
                                         super.onDismissed(snackbar, event);
-                                        Toast.makeText(ViewPDFActivity.this, "Document saved at: " + filePath, Toast.LENGTH_LONG).show();
+                                        Toast.makeText(ViewPDFActivity.this, "Tài liệu được lưu tại:: " + filePath, Toast.LENGTH_LONG).show();
                                     }
                                 })
                                 .show();
@@ -143,7 +144,9 @@ public class ViewPDFActivity extends AppCompatActivity {
             }
         };
 
-        registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE), Context.RECEIVER_NOT_EXPORTED);
+        }
     }
 
     private void downloadFile(String pdfLink, String fileName) {
@@ -159,10 +162,10 @@ public class ViewPDFActivity extends AppCompatActivity {
                     .setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, File.separator + fileName);
 
             downloadId = downloadManager.enqueue(request);
-            showProgressDialog("Downloading PDF...");
+            showProgressDialog("Đang tải tài liệu xuống...");
 
         } catch (Exception e) {
-            Toast.makeText(this, "Error downloading PDF: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Lỗi: " + e.getMessage(), Toast.LENGTH_SHORT).show();
         }
     }
 

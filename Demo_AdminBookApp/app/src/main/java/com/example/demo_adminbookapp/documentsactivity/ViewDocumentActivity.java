@@ -32,7 +32,7 @@ import com.google.android.material.snackbar.Snackbar;
 import java.io.File;
 import java.net.URLEncoder;
 
-public class ViewPDFActivity extends AppCompatActivity {
+public class ViewDocumentActivity extends AppCompatActivity {
 
     private static final int REQUEST_WRITE_EXTERNAL_STORAGE = 1;
 
@@ -45,7 +45,7 @@ public class ViewPDFActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_viewpdf);
+        setContentView(R.layout.activity_view_document);
 
         pdfview = findViewById(R.id.viewPdf);
         btnDownload = findViewById(R.id.btnDownload);
@@ -138,7 +138,7 @@ public class ViewPDFActivity extends AppCompatActivity {
                                     public void onDismissed(Snackbar snackbar, int event) {
                                         super.onDismissed(snackbar, event);
                                         // Sau khi Snackbar biến mất, hiển thị Toast với đường dẫn đến file
-                                        Toast.makeText(ViewPDFActivity.this, "File saved at: " + filePath, Toast.LENGTH_LONG).show();
+                                        Toast.makeText(ViewDocumentActivity.this, "File saved at: " + filePath, Toast.LENGTH_LONG).show();
                                     }
                                 })
                                 .show();

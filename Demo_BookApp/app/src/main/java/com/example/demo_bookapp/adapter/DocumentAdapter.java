@@ -1,20 +1,19 @@
 package com.example.demo_bookapp.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.example.demo_bookapp.ShowDocumentActivity;
 import com.example.demo_bookapp.R;
 import com.example.demo_bookapp.ViewPDFActivity;
 import com.example.demo_bookapp.model.DocumentModel;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import androidx.annotation.NonNull;
@@ -24,7 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 // Lớp Adapter để hiển thị danh sách các tài liệu trong RecyclerView
 public class DocumentAdapter extends RecyclerView.Adapter<MyViewHolder> {
 
-    private Context context; // Context để bắt đầu các hoạt động
+    private final Context context; // Context để bắt đầu các hoạt động
     private List<DocumentModel> dataList; // Danh sách dữ liệu tài liệu để hiển thị
 
     // Hàm khởi tạo để khởi tạo adapter với context và danh sách dữ liệu
@@ -47,7 +46,8 @@ public class DocumentAdapter extends RecyclerView.Adapter<MyViewHolder> {
         // Đặt tiêu đề, môn học và năm cho tài liệu hiện tại
         holder.recTitle.setText(dataList.get(position).getTitle());
         holder.recSubject.setText(dataList.get(position).getSubjectName());
-        holder.recYear.setText("2023");
+        int year = Calendar.getInstance().get(Calendar.YEAR);
+        holder.recYear.setText(year);
 
         // Đặt OnClickListener cho CardView để mở trình xem PDF khi nhấn vào
         holder.recCard.setOnClickListener(new View.OnClickListener() {
@@ -69,6 +69,7 @@ public class DocumentAdapter extends RecyclerView.Adapter<MyViewHolder> {
     }
 
     // Cập nhật danh sách dữ liệu với danh sách mới và thông báo cho adapter để làm mới
+    @SuppressLint("NotifyDataSetChanged")
     public void searchDataList(ArrayList<DocumentModel> searchList){
         dataList = searchList;
         notifyDataSetChanged();

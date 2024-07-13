@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ManageImageActivity">
+    tools:context=".documentsactivity.ManageDocumentActivity">
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -23,14 +23,14 @@
             android:src="@drawable/image_picture" />
 
         <TextView
-            android:id="@+id/txtNumberImage"
+            android:id="@+id/txtNumberDocument"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_below="@id/linearLayout"
             android:layout_marginStart="10dp"
             android:textSize="25dp"
-            android:text="Số Ảnh Hiện Có:"
+            android:text="Số File Đã Tải Lên:"
             android:textStyle="bold"
             android:textColor="@color/black"/>
 
